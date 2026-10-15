@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="WYD.Admin.WebAPI/WYD.Admin.WebAPI.csproj" />
+  <Project Path="WYD.Common/WYD.Common.csproj" Id="7665f924-0d27-4bb9-9dfd-792eaef689d7" />
+  <Project Path="WYD.Entity/WYD.Entity.csproj" Id="b8618a73-14cf-4e77-8c4c-7729480ba326" />
+  <Project Path="WYD.Infrastructure/WYD.Infrastructure.csproj" Id="1fb6b28d-92bd-47fd-82fe-ab702569e482" />
+  <Project Path="WYD.Model/WYD.Model.csproj" Id="9c67179c-630a-4d2f-97de-da7a00fdf6a4" />
+  <Project Path="WYD.Service/WYD.Service.csproj" Id="14e59a44-6e4e-4240-b908-ef06a54a0f52" />
+  <Project Path="WYD.ServiceCore/WYD.ServiceCore.csproj" Id="2202135b-8263-4d4b-95d8-c56a4b86123d" />
+</Solution>
