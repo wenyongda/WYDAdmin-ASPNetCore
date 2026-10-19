@@ -69,3 +69,4 @@ public class ApiResult : Dictionary<string, object?>
 public class ApiResult<T> : ApiResult
 {
     public T? Result { get; set; }
+}

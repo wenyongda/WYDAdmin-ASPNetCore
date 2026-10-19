@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using WYD.Admin.WebAPI.Extensions;
+using WYD.Infrastructure.Localization;
 
 // 配置 Serilog（在 CreateBuilder 之前，确保启动日志也能捕获）
 var config = new ConfigurationBuilder()
@@ -47,6 +48,9 @@ try
     builder.Services.AddHealthChecks();
 
     var app = builder.Build();
+
+    // 注入 HttpContextAccessor，供多语言（CultureManage）解析 Accept-Language
+    CultureManage.Configure(app.Services.GetRequiredService<IHttpContextAccessor>());
 
     // EF Core 预热：启动时提前初始化 DbContext，防止首次请求慢
     app.InitializeDatabaseContexts();
