@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using WYD.Common.Extensions;
 using WYD.Common.Helper;
 using WYD.Infrastructure.Controllers;
+using WYD.Infrastructure.CustomException;
 using WYD.Infrastructure.Model;
 
 namespace WYD.Admin.WebAPI.Controllers.Auth;
@@ -109,6 +110,8 @@ public class AuthController : ApiBaseController
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] EncryptedLoginRequest request)
     {
+        if (request == null) { throw new CustomException("请求参数错误"); }
+
         // 验证参数
         if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
         {

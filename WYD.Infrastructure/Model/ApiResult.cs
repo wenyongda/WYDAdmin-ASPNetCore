@@ -1,3 +1,5 @@
+using WYD.Infrastructure.CustomException;
+
 namespace WYD.Infrastructure.Model;
 
     /// <summary>

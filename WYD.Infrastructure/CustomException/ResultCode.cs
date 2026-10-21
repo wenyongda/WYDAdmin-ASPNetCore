@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace WYD.Infrastructure.Model;
+namespace WYD.Infrastructure.CustomException;
 /// <summary>
 /// API返回结果状态码
 /// </summary>
