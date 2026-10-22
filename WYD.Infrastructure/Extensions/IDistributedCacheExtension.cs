@@ -1,16 +1,35 @@
+using System;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
-using WYD.Common.Extensions;
-using WYD.Common.Helper;
 using WYD.Infrastructure.Localization;
 
-namespace WYD.Common.Extensions;
+namespace WYD.Infrastructure.Extensions;
 
 /// <summary>
 /// 扩展分布式缓存接口,集成常用方法
 /// </summary>
 public static class IDistributedCacheExtension
 {
+    /// <summary>
+    /// 序列化选项：驼峰命名 + 关闭默认转义（与 WYD.Common.Helper.JsonHelper 的输出保持一致）
+    /// </summary>
+    private static readonly JsonSerializerOptions SerializeOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
+
+    /// <summary>
+    /// 反序列化选项：启用大小写不敏感
+    /// </summary>
+    private static readonly JsonSerializerOptions DeserializeOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     /// <summary>
     /// 删除指定key
     /// </summary>
@@ -28,7 +47,7 @@ public static class IDistributedCacheExtension
             return false;
         }
     }
-    
+
     /// <summary>
     /// 设置object类型的key
     /// </summary>
@@ -39,7 +58,7 @@ public static class IDistributedCacheExtension
     {
         try
         {
-            var valueStr = JsonHelper.ObjectToJson(value);
+            var valueStr = JsonSerializer.Serialize(value, SerializeOptions);
             distributedCache.SetString(key, valueStr);
             return true;
         }
@@ -81,7 +100,7 @@ public static class IDistributedCacheExtension
     {
         try
         {
-            var valueStr = JsonHelper.ObjectToJson(value);
+            var valueStr = JsonSerializer.Serialize(value, SerializeOptions);
             distributedCache.SetString(key, valueStr, new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = timeOut });
             return true;
         }
@@ -90,7 +109,7 @@ public static class IDistributedCacheExtension
             return false;
         }
     }
-    
+
     /// <summary>
     /// 读取 Object 类型的key
     /// </summary>
@@ -102,8 +121,8 @@ public static class IDistributedCacheExtension
         try
         {
             var valueStr = distributedCache.GetString(key);
-            var value = JsonHelper.JsonToObject<T>(valueStr);
-            return value;
+            var value = JsonSerializer.Deserialize<T>(valueStr, DeserializeOptions);
+            return value!;
         }
         catch
         {
@@ -123,7 +142,8 @@ public static class IDistributedCacheExtension
             var value = db.StringGet(key);
             if (value.IsNull)
                 return default;
-            return JsonHelper.JsonToObject<T>(value!);
+            // RedisValue 同时可隐式转换为 string / ReadOnlySpan<byte>，显式取字符串以消除 Deserialize 的重载二义性
+            return JsonSerializer.Deserialize<T>(value.ToString(), DeserializeOptions);
         }
         catch
         {
@@ -178,7 +198,7 @@ public static class IDistributedCacheExtension
     }
 
     /// <summary>
-    /// 异常安全的缓存优先读取（需 Redis 故障降级的场景，如供应商对账缓存，见 doc/缓存机制与规范.md §6.2.1）：
+    /// 异常安全的缓存优先读取（需 Redis 故障降级的场景，如供应商对账缓存）：
     /// 与 GetCacheObj(prefix, ex, id, func) 行为一致，差异仅在 Redis 异常时不抛出 ——
     /// 读取异常视为未命中回源 DB；写缓存异常静默跳过；func 返回 null 不写缓存。
     /// </summary>
@@ -190,7 +210,7 @@ public static class IDistributedCacheExtension
             var valueStr = cache.GetString(cacheKey);
             if (!string.IsNullOrEmpty(valueStr))
             {
-                var cached = JsonHelper.JsonToObject<T>(valueStr);
+                var cached = JsonSerializer.Deserialize<T>(valueStr, DeserializeOptions);
                 if (cached != null)
                     return cached;
             }

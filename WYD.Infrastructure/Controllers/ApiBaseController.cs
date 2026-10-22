@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using WYD.Common.Converter;
-using WYD.Infrastructure.CustomException;
+using WYD.Infrastructure.Converter;
+using WYD.Infrastructure.Exceptions;
 using WYD.Infrastructure.Extensions;
 using WYD.Infrastructure.Model;
 

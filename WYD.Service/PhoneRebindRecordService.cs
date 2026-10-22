@@ -3,7 +3,7 @@ using WYD.Entity;
 using WYD.Model;
 using WYD.Service.IService;
 using Mapster;
-using WYD.Model.Dto;
+using WYD.Model.Dto.PhoneRebindRecord;
 
 namespace WYD.Service
 {

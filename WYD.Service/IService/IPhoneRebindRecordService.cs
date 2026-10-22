@@ -1,4 +1,4 @@
-using WYD.Model.Dto;
+using WYD.Model.Dto.PhoneRebindRecord;
 
 namespace WYD.Service.IService
 {

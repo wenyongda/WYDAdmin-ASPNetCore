@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WYD.Model;
+using WYD.Model.System;
 
 namespace WYD.Entity
 {
@@ -18,9 +19,21 @@ namespace WYD.Entity
         /// </summary>
         public static string? DefaultSchema { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+                optionsBuilder.UseNpgsql(ConnectionString);
+        }
+
         public AdminDbContext(DbContextOptions<AdminDbContext> options) : base(options)
         {
         }
+
+        #region System 模块
+
+        public DbSet<SysConfig> SysConfigs { get; set; }
+
+        #endregion
 
         /// <summary>
         /// 电话号码换绑记录

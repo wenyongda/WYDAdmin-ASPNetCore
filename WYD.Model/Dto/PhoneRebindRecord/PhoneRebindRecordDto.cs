@@ -1,4 +1,4 @@
-namespace WYD.Model.Dto
+namespace WYD.Model.Dto.PhoneRebindRecord
 {
     /// <summary>
     /// 电话号码换绑记录传输对象

@@ -1,4 +1,4 @@
-using WYD.Infrastructure.CustomException;
+using WYD.Infrastructure.Exceptions;
 
 namespace WYD.Infrastructure.Model;
 

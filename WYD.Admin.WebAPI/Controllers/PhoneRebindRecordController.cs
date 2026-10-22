@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WYD.Infrastructure.Attributes;
 using WYD.Infrastructure.Controllers;
 using WYD.Infrastructure.WebExtensions;
-using WYD.Model.Dto;
+using WYD.Model.Dto.PhoneRebindRecord;
 using WYD.Service.IService;
 
 namespace WYD.Admin.WebAPI.Controllers
