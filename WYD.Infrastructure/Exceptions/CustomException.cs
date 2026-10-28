@@ -1,4 +1,4 @@
-﻿
+
 
 namespace WYD.Infrastructure.Exceptions
 {
@@ -30,6 +30,7 @@ namespace WYD.Infrastructure.Exceptions
         public CustomException(ResultCode resultCode, string msg, bool notice = true) : base(msg)
         {
             Code = (int)resultCode;
+            Msg = msg;
             Notice = notice;
         }
 
@@ -42,6 +43,7 @@ namespace WYD.Infrastructure.Exceptions
         public CustomException(ResultCode resultCode, string msg, object errorMsg) : base(msg)
         {
             Code = (int)resultCode;
+            Msg = msg;
             if (errorMsg != null)
             {
                 LogMsg = errorMsg.ToString();

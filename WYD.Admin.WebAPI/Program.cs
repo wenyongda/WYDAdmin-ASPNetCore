@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using WYD.Admin.WebAPI.Extensions;
+using WYD.Infrastructure;
+using WYD.Infrastructure.Captcha;
 using WYD.Infrastructure.Localization;
 
 // 配置 Serilog（在 CreateBuilder 之前，确保启动日志也能捕获）
@@ -16,14 +20,34 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
+    // 初始化静态配置访问器（AppSettings / JwtUtil 依赖）
+    _ = new AppSettings(builder.Configuration);
+
     // 使用 Serilog（清除默认日志提供程序）
     builder.UseSerilogLogging();
 
     // EF Core + PostgreSQL（注册 DbContext）
     builder.Services.AddDatabaseContexts(builder.Configuration, builder.Environment);
 
-    // 注册应用程序服务（Scrutor 自动扫描 + Mapster + HttpContextAccessor）
+    // 注册应用程序服务（Scrutor 自动扫描 + Mapperly 映射器 + HttpContextAccessor）
     builder.Services.AddApplicationServices();
+
+    // 分布式缓存（验证码、刷新令牌）
+    builder.Services.AddDistributedMemoryCache();
+    builder.Services.AddScoped<ICaptchaProvider, SvgCaptchaProvider>();
+
+    // JWT 认证
+    builder.Services
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.MapInboundClaims = false;
+            options.TokenValidationParameters = JwtUtil.GetValidationParameters();
+        });
+    builder.Services.AddAuthorization();
+
+    // 多语言资源（WYD.ServiceCore/Resources/SharedResource.resx）
+    builder.Services.AddLocalization();
 
     // 配置控制器（JSON 使用 System.Text.Json 驼峰命名）
     builder.Services.AddControllers()
@@ -49,6 +73,13 @@ try
 
     var app = builder.Build();
 
+    // 按 Accept-Language 设置当前请求的 Culture/UICulture，供 IStringLocalizer 使用
+    var supportedCultures = new[] { "zh-CN", "en-US", "de-DE" };
+    app.UseRequestLocalization(new RequestLocalizationOptions()
+        .SetDefaultCulture("zh-CN")
+        .AddSupportedCultures(supportedCultures)
+        .AddSupportedUICultures(supportedCultures));
+
     // 注入 HttpContextAccessor，供多语言（CultureManage）解析 Accept-Language
     CultureManage.Configure(app.Services.GetRequiredService<IHttpContextAccessor>());
 
@@ -67,6 +98,7 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();

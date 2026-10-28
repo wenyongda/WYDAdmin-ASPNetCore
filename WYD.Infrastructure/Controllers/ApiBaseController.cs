@@ -44,6 +44,11 @@ namespace WYD.Infrastructure.Controllers
             return Content(jsonStr, "application/json");
         }
 
+        protected IActionResult ToResponse(ResultCode resultCode, string msg = "")
+        {
+            return ToResponse(GetApiResult(resultCode, msg));
+        }
+
         private static string GetJsonStr(ApiResult apiResult, string timeFormatStr)
         {
             if (string.IsNullOrEmpty(timeFormatStr))

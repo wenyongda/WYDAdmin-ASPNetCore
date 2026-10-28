@@ -3,9 +3,9 @@ using WYD.Infrastructure.Attributes;
 using WYD.Infrastructure.Controllers;
 using WYD.Infrastructure.WebExtensions;
 using WYD.Model.Dto.PhoneRebindRecord;
-using WYD.Service.IService;
+using WYD.Service.IService.PhoneRebindRecord;
 
-namespace WYD.Admin.WebAPI.Controllers
+namespace WYD.Admin.WebAPI.Controllers.PhoneRebindRecord
 {
     /// <summary>
     /// 电话号码换绑记录
@@ -58,7 +58,7 @@ namespace WYD.Admin.WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(dto.AppName))
                 return ERROR("绑定应用名称不能为空");
 
-            var createdBy = HttpContext.GetCurrentUser();
+            var createdBy = HttpContext.GetName();
             var id = await _service.CreateAsync(dto, createdBy);
             return OK(new { Id = id }, "新增成功");
         }
@@ -75,7 +75,7 @@ namespace WYD.Admin.WebAPI.Controllers
             if (string.IsNullOrWhiteSpace(dto.OldPhone) || string.IsNullOrWhiteSpace(dto.NewPhone))
                 return ERROR("旧号码与新号码不能为空");
 
-            var updatedBy = HttpContext.GetCurrentUser();
+            var updatedBy = HttpContext.GetName();
             var ok = await _service.UpdateAsync(dto, updatedBy);
             return ok ? OK(null, "更新成功") : ERROR("记录不存在或已被删除");
         }
@@ -88,7 +88,7 @@ namespace WYD.Admin.WebAPI.Controllers
         [Log(Title = "删除换绑记录")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var deletedBy = HttpContext.GetCurrentUser();
+            var deletedBy = HttpContext.GetName();
             var ok = await _service.DeleteAsync(id, deletedBy);
             return ok ? OK(null, "删除成功") : ERROR("记录不存在或已被删除");
         }
@@ -103,7 +103,7 @@ namespace WYD.Admin.WebAPI.Controllers
         {
             if (ids == null || ids.Length == 0) return ERROR("请选择要删除的记录");
 
-            var deletedBy = HttpContext.GetCurrentUser();
+            var deletedBy = HttpContext.GetName();
             var ok = await _service.BatchDeleteAsync(ids, deletedBy);
             return ok ? OK(null, "批量删除成功") : ERROR("所选记录不存在或已被删除");
         }

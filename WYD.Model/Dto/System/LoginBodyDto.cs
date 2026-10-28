@@ -31,6 +31,6 @@ public class LoginBodyDto
 
     public string LoginIP { get; set; }
 
-
+    public string ClientId { get; set; }
 }
 

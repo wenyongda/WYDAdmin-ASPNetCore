@@ -9,7 +9,7 @@ public class SysConfigMap : IEntityTypeConfiguration<SysConfig>
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<SysConfig> builder)
     {
         // Table Mappings
-        builder.ToTable("sys_config", "public");
+        builder.ToTable("sys_config");
 
         // Primary Key
         builder.HasKey(t => t.ConfigId);

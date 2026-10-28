@@ -45,15 +45,6 @@ public enum ResultCode
     [Description("Bad Request")]
     BAD_REQUEST = 400,
 
-    [Description("RSA密钥已过期")]
-    RSA_KEY_EXPIRED = 1001,
-
-    [Description("AES密钥已过期")]
-    AES_KEY_EXPIRED = 1002,
-
-    [Description("密钥交换失败")]
-    KEY_EXCHANGE_ERROR = 1003,
-
     [Description("数据解密失败")]
     DECRYPT_ERROR = 1004
 }

@@ -1,6 +1,7 @@
+using WYD.Model.Dto;
 using WYD.Model.Dto.PhoneRebindRecord;
 
-namespace WYD.Service.IService
+namespace WYD.Service.IService.PhoneRebindRecord
 {
     /// <summary>
     /// 电话号码换绑记录服务接口

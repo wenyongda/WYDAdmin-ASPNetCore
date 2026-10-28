@@ -2,7 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace WYD.Common.Helper;
+namespace WYD.Infrastructure.Helper;
 
 public static class JsonHelper
 {

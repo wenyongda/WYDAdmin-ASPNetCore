@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WYD.Model.System;
 
-public class SysConfig
+public class SysConfig : SysBase
 {
     /// <summary>
     /// 配置id

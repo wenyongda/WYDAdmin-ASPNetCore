@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 namespace WYD.Infrastructure.Converter;
 
 /// <summary>
-/// DateTime 自定义格式化转换器（替代 Newtonsoft DateFormatString）
+/// DateTime 自定义格式化转换器
 /// </summary>
 public class DateTimeFormatConverter : JsonConverter<DateTime>
 {

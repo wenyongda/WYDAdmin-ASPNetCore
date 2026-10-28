@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using WYD.Entity;
-using WYD.Model;
-using WYD.Service.IService;
-using Mapster;
+using WYD.Model.Dto;
 using WYD.Model.Dto.PhoneRebindRecord;
+using WYD.Model.Mappers;
+using WYD.Model.System.Enums;
+using WYD.Service.IService.PhoneRebindRecord;
+using PhoneRebindRecordEntity = WYD.Model.PhoneRebindRecord.PhoneRebindRecord;
 
-namespace WYD.Service
+namespace WYD.Service.PhoneRebindRecord
 {
     /// <summary>
     /// 电话号码换绑记录服务实现
@@ -13,10 +15,12 @@ namespace WYD.Service
     public class PhoneRebindRecordService : IPhoneRebindRecordService
     {
         private readonly AdminDbContext _dbContext;
+        private readonly PhoneRebindRecordMapper _mapper;
 
-        public PhoneRebindRecordService(AdminDbContext dbContext)
+        public PhoneRebindRecordService(AdminDbContext dbContext, PhoneRebindRecordMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         /// <inheritdoc />
@@ -28,7 +32,7 @@ namespace WYD.Service
             // 构建基础查询（只读，不跟踪）
             var source = _dbContext.PhoneRebindRecords
                 .AsNoTracking()
-                .Where(e => !e.IsDeleted);
+                .Where(e => e.DelFlag == DelFlagEnum.Normal);
 
             // 动态过滤条件
             source = ApplyFilters(source, query);
@@ -42,7 +46,7 @@ namespace WYD.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            var dtos = items.Adapt<List<PhoneRebindRecordDto>>();
+            var dtos = _mapper.ToDto(items);
 
             return new PageResult<PhoneRebindRecordDto>
             {
@@ -58,15 +62,15 @@ namespace WYD.Service
         {
             var entity = await _dbContext.PhoneRebindRecords
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+                .FirstOrDefaultAsync(e => e.Id == id && e.DelFlag == DelFlagEnum.Normal);
 
-            return entity?.Adapt<PhoneRebindRecordDto>();
+            return entity == null ? null : _mapper.ToDto(entity);
         }
 
         /// <inheritdoc />
         public async Task<Guid> CreateAsync(PhoneRebindRecordCreateDto dto, string createdBy)
         {
-            var entity = new PhoneRebindRecord
+            var entity = new PhoneRebindRecordEntity
             {
                 OldPhone = dto.OldPhone,
                 NewPhone = dto.NewPhone,
@@ -75,7 +79,7 @@ namespace WYD.Service
                 RebindTime = DateTime.UtcNow,
                 CreateTime = DateTime.UtcNow,
                 CreateBy = createdBy,
-                IsDeleted = false
+                DelFlag = DelFlagEnum.Normal
             };
 
             await _dbContext.PhoneRebindRecords.AddAsync(entity);
@@ -88,7 +92,7 @@ namespace WYD.Service
         public async Task<bool> UpdateAsync(PhoneRebindRecordUpdateDto dto, string updatedBy)
         {
             var entity = await _dbContext.PhoneRebindRecords
-                .FirstOrDefaultAsync(e => e.Id == dto.Id && !e.IsDeleted);
+                .FirstOrDefaultAsync(e => e.Id == dto.Id && e.DelFlag == DelFlagEnum.Normal);
 
             if (entity == null) return false;
 
@@ -109,11 +113,11 @@ namespace WYD.Service
         public async Task<bool> DeleteAsync(Guid id, string deletedBy)
         {
             var entity = await _dbContext.PhoneRebindRecords
-                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+                .FirstOrDefaultAsync(e => e.Id == id && e.DelFlag == DelFlagEnum.Normal);
 
             if (entity == null) return false;
 
-            entity.IsDeleted = true;
+            entity.DelFlag = DelFlagEnum.Deleted;
             entity.UpdateTime = DateTime.UtcNow;
             entity.UpdateBy = deletedBy;
 
@@ -130,9 +134,9 @@ namespace WYD.Service
 
             var now = DateTime.UtcNow;
             var affected = await _dbContext.PhoneRebindRecords
-                .Where(e => ids.Contains(e.Id) && !e.IsDeleted)
+                .Where(e => ids.Contains(e.Id) && e.DelFlag == DelFlagEnum.Normal)
                 .ExecuteUpdateAsync(p => p
-                    .SetProperty(x => x.IsDeleted, true)
+                    .SetProperty(x => x.DelFlag, DelFlagEnum.Deleted)
                     .SetProperty(x => x.UpdateTime, now)
                     .SetProperty(x => x.UpdateBy, deletedBy));
 
@@ -142,7 +146,7 @@ namespace WYD.Service
         /// <summary>
         /// 应用过滤条件
         /// </summary>
-        private static IQueryable<PhoneRebindRecord> ApplyFilters(IQueryable<PhoneRebindRecord> source, PhoneRebindRecordQueryDto query)
+        private static IQueryable<PhoneRebindRecordEntity> ApplyFilters(IQueryable<PhoneRebindRecordEntity> source, PhoneRebindRecordQueryDto query)
         {
             if (!string.IsNullOrWhiteSpace(query.OldPhone))
                 source = source.Where(e => e.OldPhone.Contains(query.OldPhone));

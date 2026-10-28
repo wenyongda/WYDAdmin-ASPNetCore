@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Text;
-using WYD.Infrastructure.Extensions;
+using WYD.Infrastructure.Cache;
 
 namespace WYD.Infrastructure.Captcha
 {
@@ -65,7 +65,7 @@ namespace WYD.Infrastructure.Captcha
             if (ok && removeIfSuccess)
             {
                 // IDistributedCache.Remove 是接口实例方法（异常会抛出），这里走扩展方法以吞掉 Redis 异常
-                IDistributedCacheExtension.Remove(_distributedCache, CacheKey(id));
+                _distributedCache.TryRemove(CacheKey(id));
             }
 
             return ok;

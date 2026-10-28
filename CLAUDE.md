@@ -40,7 +40,7 @@ WYD.Model → (无项目引用)
 | 运行时 | .NET 10 (net10.0) |
 | Web 框架 | ASP.NET Core Web API |
 | ORM | EF Core (Npgsql.EntityFrameworkCore.PostgreSQL) + Dapper |
-| 对象映射 | Mapster |
+| 对象映射 | Mapperly（Riok.Mapperly，编译期源生成） |
 | 缓存 | StackExchange.Redis |
 | 日志 | Serilog |
 | 加密 | BouncyCastle.Cryptography |
@@ -85,7 +85,8 @@ docker build -f WYD.Admin.WebAPI/Dockerfile -t wydadmin .
   - DTO：`WYD.Model/PhoneRebindRecordDto.cs`（Dto、CreateDto、UpdateDto、QueryDto、PageResult）
   - 服务：`WYD.Service/PhoneRebindRecordService.cs` + `WYD.Service/IService/IPhoneRebindRecordService.cs`
   - 控制器：`WYD.Admin.WebAPI/Controllers/PhoneRebindRecordController.cs`（路由 `system/phone-rebind`）
-  - 映射：`WYD.Entity/Mappings/PhoneRebindRecordMap.cs`
+  - 映射：`WYD.Entity/Mappings/PhoneRebindRecordMap.cs`（EF Core 实体配置）
+  - 对象映射：`WYD.Model/Mappers/PhoneRebindRecordMapper.cs`
 
 ### 基础设施组件
 
@@ -99,7 +100,7 @@ docker build -f WYD.Admin.WebAPI/Dockerfile -t wydadmin .
 
 ### WebAPI 扩展
 
-- `WYD.Admin.WebAPI/Extensions/DependencyInjectionExtensions.cs` — Scrutor 自动扫描 + Mapster + HttpContextAccessor
+- `WYD.Admin.WebAPI/Extensions/DependencyInjectionExtensions.cs` — Scrutor 自动扫描 + Mapperly 映射器 + HttpContextAccessor
 - `WYD.Admin.WebAPI/Extensions/DatabaseContextExtensions.cs` — DbContext 注册、初始化、预热
 - `WYD.Admin.WebAPI/Extensions/SerilogExtensions.cs` — Serilog 配置（按级别分文件 + 控制台）
 
@@ -120,5 +121,5 @@ docker build -f WYD.Admin.WebAPI/Dockerfile -t wydadmin .
 - **软删除**：使用 `IsDeleted` 标记，查询时过滤 `!e.IsDeleted`
 - **审计字段**：CreateBy/CreateName/CreateTime + UpdateBy/UpdateName/UpdateTime
 - **DI 注册**：使用 Scrutor 自动扫描，服务实现类与接口放在 `WYD.Service` 项目
-- **对象映射**：使用 Mapster，通过 `Adapt<T>()` 扩展方法
+- **对象映射**：使用 Mapperly，在 `WYD.Model/Mappers/` 中以 `[Mapper]` 声明的 partial 类，编译期生成映射代码（无反射）
 - **日志**：使用 Serilog，通过 `LogAttribute` 切面记录操作日志

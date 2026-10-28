@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Mapperly：编译期源生成对象映射，替代 Mapster 的运行时反射映射。
+         PrivateAssets=all 避免分析器/源生成器传递到下游项目。 -->
+    <PackageReference Include="Riok.Mapperly" Version="4.3.1" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

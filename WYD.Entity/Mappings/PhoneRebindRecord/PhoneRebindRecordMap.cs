@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WYD.Model;
+using WYD.Model.PhoneRebindRecord;
+using WYD.Model.System.Enums;
 
 namespace WYD.Entity.Mappings
 {
     /// <summary>
     /// PhoneRebindRecord entity configuration - t_phone_rebind_record table
+    /// 审计字段（CreateBy/CreateName/CreateTime/UpdateBy/UpdateName/UpdateTime/Remark）
+    /// 由 SysBaseMappingExtensions 统一配置，此处不再重复。
     /// </summary>
     public class PhoneRebindRecordMap : IEntityTypeConfiguration<PhoneRebindRecord>
     {
@@ -38,39 +41,11 @@ namespace WYD.Entity.Mappings
                 .HasColumnName("rebind_time")
                 .IsRequired();
 
-            builder.Property(e => e.Remark)
-                .HasColumnName("remark")
-                .HasMaxLength(500);
-
-            builder.Property(e => e.CreateBy)
-                 .HasColumnName("create_by")
-                 .HasMaxLength(50)
-                 .IsRequired();
-
-            builder.Property(e => e.CreateName)
-                .HasColumnName("create_name")
-                .HasMaxLength(64)
-                .IsRequired();
-
-            builder.Property(e => e.CreateTime)
-                .HasColumnName("create_time")
-                .IsRequired();
-
-            builder.Property(e => e.UpdateBy)
-                .HasColumnName("update_by")
-                .HasMaxLength(50);
-
-            builder.Property(e => e.UpdateName)
-                .HasColumnName("update_name")
-                .HasMaxLength(64);
-
-            builder.Property(e => e.UpdateTime)
-                .HasColumnName("update_time");
-
-            builder.Property(e => e.IsDeleted)
-                .HasColumnName("ISDELETED")
+            builder.Property(e => e.DelFlag)
+                .HasColumnName("del_flag")
+                .HasConversion<int>()
                 .IsRequired()
-                .HasDefaultValue(false);
+                .HasDefaultValue(DelFlagEnum.Normal);
 
             // 索引
             builder.HasIndex(e => e.OldPhone).HasDatabaseName("IX_REBIND_OLDPHONE");

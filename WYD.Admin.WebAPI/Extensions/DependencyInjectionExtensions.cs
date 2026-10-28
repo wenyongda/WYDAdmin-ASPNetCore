@@ -1,6 +1,6 @@
 using System.Reflection;
-using Mapster;
-using MapsterMapper;
+using WYD.Model.Mappers;
+using WYD.Model.Mappers.System;
 
 namespace WYD.Admin.WebAPI.Extensions
 {
@@ -10,7 +10,7 @@ namespace WYD.Admin.WebAPI.Extensions
     public static class DependencyInjectionExtensions
     {
         /// <summary>
-        /// 注册应用程序服务（Scrutor 自动扫描 + Mapster + HttpContextAccessor）
+        /// 注册应用程序服务（Scrutor 自动扫描 + Mapperly 映射器 + HttpContextAccessor）
         /// </summary>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
@@ -23,9 +23,10 @@ namespace WYD.Admin.WebAPI.Extensions
                 .WithScopedLifetime()
             );
 
-            // 注册 Mapster DI
-            services.AddSingleton(TypeAdapterConfig.GlobalSettings);
-            services.AddScoped<IMapper, ServiceMapper>();
+            // 注册 Mapperly 映射器（编译期生成、无状态，注册为单例）
+            services.AddSingleton<PhoneRebindRecordMapper>();
+            services.AddSingleton<SysRoleMapper>();
+            services.AddSingleton<SysPostMapper>();
 
             // 注册 HttpContextAccessor
             services.AddHttpContextAccessor();

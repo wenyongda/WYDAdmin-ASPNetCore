@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WYD.Entity;
 using WYD.Model.System;
 using WYD.ServiceCore.Services.IService;
@@ -17,7 +17,7 @@ public class SysConfigService : ISysConfigService
         _adminDbContext = adminDbContext;
     }
 
-    public Task<SysConfig> GetSysConfigByKeyAsync(string key)
-    => _adminDbContext.SysConfigs.FirstAsync(c => c.ConfigKey == key);
+    public Task<SysConfig?> GetSysConfigByKeyAsync(string key)
+    => _adminDbContext.SysConfigs.FirstOrDefaultAsync(c => c.ConfigKey == key);
     
 }
